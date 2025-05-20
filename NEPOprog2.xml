@@ -1,0 +1,234 @@
+<export xmlns="http://de.fhg.iais.roberta.blockly">
+    <program>
+        <block_set xmlns="http://de.fhg.iais.roberta.blockly" robottype="edison" xmlversion="3.1"
+            description="" tags="">
+            <instance x="43" y="40">
+                <block type="robControls_start" id="NxL8PVjJ)IxBA-ROd,GN" intask="true"
+                    deletable="false">
+                    <mutation declare="true"></mutation>
+                    <field name="DEBUG">TRUE</field>
+                    <data>
+                        {"learningRate":0.03,"regularizationRate":0,"noise":0,"batchSize":10,"discretize":false,"percTrainData":50,"activationKey":"linear","activation":{},"regularization":null,"initUntil":null,"collectStats":false,"numHiddenLayers":0,"networkShape":[],"weights":[[["1"]],[[]]],"biases":[["0"],["0"]],"precision":"2","weightArcMaxSize":8,"weightSuppressMultOp":true,"inputs":["n1"],"outputs":["n2"],"hiddenNeurons":[]}</data>
+                    <statement name="ST">
+                        <block type="robGlobalVariables_declare" id="2+TQQaTSBLXl7CYY;RQb"
+                            intask="true" deletable="false">
+                            <mutation next="true" declaration_type="Number"></mutation>
+                            <field name="VAR">number</field>
+                            <field name="TYPE">Number</field>
+                            <value name="VALUE">
+                                <block type="math_integer" id="-EyNX1vPLgUoYj0X[^Z@" intask="true">
+                                    <field name="NUM">5</field>
+                                </block>
+                            </value>
+                        </block>
+                        <block type="robGlobalVariables_declare" id="7HvA/x?.suh}iVgJGA73"
+                            intask="true" deletable="false">
+                            <mutation next="true" declaration_type="Boolean"></mutation>
+                            <field name="VAR">bool</field>
+                            <field name="TYPE">Boolean</field>
+                            <value name="VALUE">
+                                <block type="logic_boolean" id=".bK{oIo=n|Ls@VLUrXiu" intask="true">
+                                    <field name="BOOL">TRUE</field>
+                                </block>
+                            </value>
+                        </block>
+                        <block type="robGlobalVariables_declare" id="U8v~UAjJi=UI|5E,/D6E"
+                            intask="true" deletable="false">
+                            <mutation next="true" declaration_type="Array_Number"></mutation>
+                            <field name="VAR">list</field>
+                            <field name="TYPE">Array_Number</field>
+                            <value name="VALUE">
+                                <block type="robLists_create_with" id="*:h#WagP8%Lyn_SBA{G8"
+                                    intask="true">
+                                    <mutation items="3" list_type="Number"></mutation>
+                                    <field name="LIST_TYPE">Number</field>
+                                    <value name="ADD0">
+                                        <block type="math_integer" id="LQFR.-:9((OnY86x%yn+"
+                                            intask="true">
+                                            <field name="NUM">0</field>
+                                        </block>
+                                    </value>
+                                    <value name="ADD1">
+                                        <block type="math_integer" id="f70k^cVe1jwgS~#uI-*z"
+                                            intask="true">
+                                            <field name="NUM">1</field>
+                                        </block>
+                                    </value>
+                                    <value name="ADD2">
+                                        <block type="math_integer" id="4i(.6ry{54fT_-oBokwu"
+                                            intask="true">
+                                            <field name="NUM">2</field>
+                                        </block>
+                                    </value>
+                                </block>
+                            </value>
+                        </block>
+                    </statement>
+                </block>
+                <block type="robControls_loopForever" id="`TS-p|[{#rK7kI_4Svmk" intask="true">
+                    <statement name="DO">
+                        <block type="robActions_motorDiff_on_for" id="+]Mi%pBBp)dHzFx(3r9P"
+                            intask="true">
+                            <field name="DIRECTION">FOREWARD</field>
+                            <value name="POWER">
+                                <block type="math_integer" id="rK6k29:^@Cey4W|kD]z[" intask="true">
+                                    <field name="NUM">30</field>
+                                </block>
+                            </value>
+                            <value name="DISTANCE">
+                                <block type="math_integer" id="ie8W?Y]ebv9JX)2)H{*]" intask="true">
+                                    <field name="NUM">20</field>
+                                </block>
+                            </value>
+                        </block>
+                        <block type="robControls_if" id="v,3qiuXDgLn=*C)0fke)" intask="true">
+                            <mutation elseif="1"></mutation>
+                            <repetitions>
+                                <value name="IF0">
+                                    <block type="robSensors_infrared_getSample"
+                                        id="ah9wXu5s8iKpSr4aJLhz" intask="true">
+                                        <mutation mode="OBSTACLE"></mutation>
+                                        <field name="MODE">OBSTACLE</field>
+                                        <field name="SENSORPORT">FRONT</field>
+                                        <field name="SLOT"></field>
+                                    </block>
+                                </value>
+                                <statement name="DO0">
+                                    <block type="robActions_motorDiff_turn_for"
+                                        id="K@`ru1RrsL{N,qRRB)cG" intask="true">
+                                        <field name="DIRECTION">RIGHT</field>
+                                        <value name="POWER">
+                                            <block type="math_integer" id="4M`Ct-b7SA:^Xh(raHgw"
+                                                intask="true">
+                                                <field name="NUM">30</field>
+                                            </block>
+                                        </value>
+                                        <value name="DEGREE">
+                                            <block type="math_integer" id="hi`_EVt[6-VMoFH`eV^X"
+                                                intask="true">
+                                                <field name="NUM">90</field>
+                                            </block>
+                                        </value>
+                                    </block>
+                                </statement>
+                                <value name="IF1">
+                                    <block type="robSensors_infrared_getSample"
+                                        id=";C1GIo?PG4`Hlx9XH}s-" intask="true">
+                                        <mutation mode="OBSTACLE"></mutation>
+                                        <field name="MODE">OBSTACLE</field>
+                                        <field name="SENSORPORT">RIGHT</field>
+                                        <field name="SLOT"></field>
+                                    </block>
+                                </value>
+                                <statement name="DO1">
+                                    <block type="robActions_motorDiff_turn_for"
+                                        id="uy5YSt%I)#1=15omG*P7" intask="true">
+                                        <field name="DIRECTION">LEFT</field>
+                                        <value name="POWER">
+                                            <block type="math_integer" id="z?-SM.M6s^Fnl^~L[r(o"
+                                                intask="true">
+                                                <field name="NUM">30</field>
+                                            </block>
+                                        </value>
+                                        <value name="DEGREE">
+                                            <block type="math_integer" id="z(bCWdl!dNP/JJXX4j{#"
+                                                intask="true">
+                                                <field name="NUM">90</field>
+                                            </block>
+                                        </value>
+                                    </block>
+                                </statement>
+                            </repetitions>
+                        </block>
+                    </statement>
+                </block>
+                <block type="controls_repeat_ext" id=";1*acbNne~Abj6B%FmB7" intask="true">
+                    <value name="TIMES">
+                        <block type="math_integer" id="Q0{,.M~B|MrLU6zCA@*Z" intask="true">
+                            <field name="NUM">10</field>
+                        </block>
+                    </value>
+                </block>
+                <block type="robControls_wait_time" id="z#F]P`TTTS]hdU6(]R)b" intask="true">
+                    <value name="WAIT">
+                        <block type="math_integer" id="mNr8aDMK.1i!8M@j77Bi" intask="true">
+                            <field name="NUM">500</field>
+                        </block>
+                    </value>
+                </block>
+                <block type="robControls_wait_for" id="pE]QcgSR8w_T,Fc|-iFL" intask="true">
+                    <value name="WAIT0">
+                        <block type="logic_compare" id="A]OZsAaVGhV@1]a*92~D" intask="true">
+                            <field name="OP">EQ</field>
+                            <value name="A">
+                                <block type="robSensors_getSample" id="}!*l=U;*Wfh2.#tE?[h3"
+                                    intask="true">
+                                    <mutation input="KEY_PRESSED"></mutation>
+                                    <field name="SENSORTYPE">KEY_PRESSED</field>
+                                    <field name="SENSORPORT">PLAY</field>
+                                    <field name="SLOT"></field>
+                                </block>
+                            </value>
+                            <value name="B">
+                                <block type="logic_boolean" id="A;5DUOpvQa6|IH@g^@rW" intask="true">
+                                    <field name="BOOL">TRUE</field>
+                                </block>
+                            </value>
+                        </block>
+                    </value>
+                </block>
+            </instance>
+            <instance x="848" y="296">
+                <block type="robControls_ifElse" id="C^Qb-f*MZqtAG[K#{j_8" intask="false">
+                    <mutation else="1"></mutation>
+                    <repetitions>
+                        <statement name="DO0">
+                            <block type="robActions_motorDiff_on_for" id="-erwnCtPr`onBJ~~z_ua"
+                                intask="false">
+                                <field name="DIRECTION">FOREWARD</field>
+                                <value name="POWER">
+                                    <block type="math_integer" id="X;@CCzJfY!i9_:AjjN9p"
+                                        intask="false">
+                                        <field name="NUM">30</field>
+                                    </block>
+                                </value>
+                                <value name="DISTANCE">
+                                    <block type="math_integer" id="NX99Tf53h-ng6[j?)e6a"
+                                        intask="false">
+                                        <field name="NUM">50</field>
+                                    </block>
+                                </value>
+                            </block>
+                        </statement>
+                        <statement name="ELSE">
+                            <block type="robActions_motorDiff_on_for" id="FUbm89I(fE^RBwQ6(fz{"
+                                intask="false">
+                                <field name="DIRECTION">FOREWARD</field>
+                                <value name="POWER">
+                                    <block type="math_integer" id="nwAF.,tc:-,CB3i@iAL^"
+                                        intask="false">
+                                        <field name="NUM">30</field>
+                                    </block>
+                                </value>
+                                <value name="DISTANCE">
+                                    <block type="math_integer" id="hNR|=auQ)`p.qrkJ8R6%"
+                                        intask="false">
+                                        <field name="NUM">20</field>
+                                    </block>
+                                </value>
+                            </block>
+                        </statement>
+                    </repetitions>
+                </block>
+            </instance>
+        </block_set>
+    </program>
+    <config>
+        <block_set xmlns="http://de.fhg.iais.roberta.blockly" robottype="edison" xmlversion="3.1"
+            description="" tags="">
+            <instance x="213" y="213">
+                <block type="robBrick_Edison-Brick" id="1" intask="true" deletable="false" />
+            </instance>
+        </block_set>
+    </config>
+</export>
