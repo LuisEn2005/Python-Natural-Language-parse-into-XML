@@ -1,0 +1,8 @@
+var speed = 20
+var distance = 30
+var thebool = false
+
+Move Forward at speed with distance cm
+
+loop ():
+  Move Forward at speed with distance cm
