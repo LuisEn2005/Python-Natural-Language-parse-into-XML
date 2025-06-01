@@ -24,6 +24,18 @@ El sistema permite:
 - Representación de AST en **JSON**.
 
 ## 📦 Estructura del Proyecto
+│
+├── main.py # Script principal del compilador
+├── parser/
+│ ├── init.py
+│ ├── xml_reader.py # Lector y analizador de archivos XML
+│ └── ast_generator.py # Generador del AST
+├── examples/
+│ ├── programa1.xml # Archivos XML de ejemplo
+│ └── programa2.xml
+├── output/
+│ └── ast_programa1.json # Resultados del AST
+└── README.md
 
 ## ▶️ Ejecución del Proyecto
 
