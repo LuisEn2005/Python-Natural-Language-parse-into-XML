@@ -1,13 +1,13 @@
-# 🛠️ Simulador de Compilador Educativo - Open Roberta + Python
+# 🛠️ Procesamiento de Lenguaje Natural a XML - Open Roberta + Python
 
-Este proyecto presenta el diseño e implementación de un compilador educativo desarrollado en Python. Su propósito es interpretar programas visuales en formato XML generados por la plataforma **Open Roberta**, convirtiéndolos en estructuras intermedias que facilitan la comprensión del proceso de compilación.
+Este proyecto presenta el diseño e implementación de un conversor de comandos en español a instrucciones XML para Open Roberta siendo desarrollado en Python. Su propósito es interpretar programas visuales en formato XML generados por la plataforma **Open Roberta**, convirtiéndolos en estructuras intermedias que facilitan la comprensión del proceso de compilación.
 
 ## 📚 Descripción
 
 El sistema permite:
-- Leer archivos XML exportados desde Open Roberta.
-- Analizar bloques visuales como sensores, acciones robóticas y estructuras de control.
-- Generar un árbol de sintaxis abstracta (**AST**) estructurado en formato JSON.
+- Leer archivos de texto con python.
+- Analizar variables, instrucciones y condiciones escritas en lenguaje natural humano.
+- Generar un archivo XML para ver en Open Roberta.
 - Ayudar a estudiantes a entender cómo los bloques se transforman en estructuras de datos formales.
 
 ## 🎯 Objetivos del Proyecto
