@@ -12,14 +12,14 @@ El sistema permite:
 
 ## 🎯 Objetivos del Proyecto
 
-- Diseñar un analizador de archivos XML basados en Open Roberta.
+- Diseñar una alternativa para generar código que pueda interpretar Open Roberta Lab.
 - Representar visualmente la estructura lógica del código.
-- Sentar las bases para la futura generación automática de pseudocódigo o código Python.
+- Sentar la habilidad y potencial que merece el código de Python.
 
 ## 🧰 Tecnologías Utilizadas
 
 - **Python 3.10+**
-- `xml.etree.ElementTree` para el análisis de XML.
+- `xml.etree.ElementTree` para la creación de archivos de XML.
 - **Open Roberta** como plataforma de origen.
-- Representación de AST en **JSON**.
+- **REGEX** para aplicar patrones de Expresiones Regulares
 
