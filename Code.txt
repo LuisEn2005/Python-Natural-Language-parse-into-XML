@@ -1,8 +1,13 @@
 var speed = 20
 var distance = 30
 var thebool = false
+var lista = [1,2,3]
 
-Move Forward at speed with distance cm
+Move Forward distance at speed
+Move Backward at 30
 
-loop ():
+Turn Right 20 at 30
+Turn Left at 30
+
+loop():
   Move Forward at speed with distance cm
