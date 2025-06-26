@@ -3,6 +3,23 @@ import random
 import string
 import re
 
+symbol_table = {}
+
+def register_variable(name, var_type, value):
+    if name in symbol_table:
+        raise ValueError(f"Variable '{name}' ya declarada.")
+    symbol_table[name] = {"type": var_type, "value": value}
+
+def lookup_variable(name):
+    if name not in symbol_table:
+        raise ValueError(f"Variable '{name}' no declarada.")
+    return symbol_table[name]
+
+def validate_variable_usage(var_name, expected_type):
+    var = lookup_variable(var_name)
+    if var["type"] != expected_type:
+        raise ValueError(f"Se esperaba una variable de tipo '{expected_type}' pero se encontró '{var['type']}' para '{var_name}'.")
+
 def generate_open_roberta_id(length=20):
     characters = string.ascii_letters + string.digits + "!@#$%^&*()-_=+[]{}|;:',.<>?/"
     return ''.join(random.choice(characters) for _ in range(length))
@@ -92,7 +109,7 @@ def findVar(line):
                 field_type = "Boolean"
                 block_type = "logic_boolean"
                 field_name = "BOOL"
-
+            register_variable(variable_name, field_type, variable_value)
             # Configuración de nodos comunes
             field_var = ET.SubElement(variable_block, "field", {"name": "VAR"})
             field_type_field = ET.SubElement(variable_block, "field", {"name": "TYPE"})
@@ -144,6 +161,11 @@ def generate_action_block(line):
     speed = match.group(3 if has_distance else 2)
     distance = match.group(2) if has_distance else None  # Distancia será None si no está presente
 
+    if not speed.isdigit():
+        validate_variable_usage(speed, "Number")
+    if has_distance and not distance.isdigit():
+        validate_variable_usage(distance, "Number")
+    
     # Crear el bloque principal
     if(has_distance):
         block_action = ET.SubElement(instance_program, "block", {
@@ -219,7 +241,12 @@ def generate_turn_block(line):
     direction = match.group(1).upper()
     speed = match.group(3 if has_degree else 2)
     degree = match.group(2) if has_degree else None  # Distancia será None si no está presente
-
+    
+    if not speed.isdigit():
+        validate_variable_usage(speed)  # Verifica que `speed` esté declarada.
+    if has_degree and not degree.isdigit():
+        validate_variable_usage(degree)
+    
     # Crear el bloque principal
     if(has_degree):
         block_action = ET.SubElement(instance_program, "block", {
@@ -341,13 +368,20 @@ block_brick = ET.SubElement(instance_config, "block", {
 
 f = open("Code.txt", "r")
 
+def process_line(line):
+    try:
+        findVar(line)
+        generate_action_block(line)
+        generate_turn_block(line)
+    except ValueError as e:
+        print(f"Error en línea '{line.strip()}': {e}")
+
 while True:
     line = f.readline()
     if(len(line) == 0):
         break
-    findVar(line)
-    generate_action_block(line)
-    generate_turn_block(line)
+    process_line(line)
+    
 f.close()
 
 # Escribir el árbol XML a un archivo sin la declaración
