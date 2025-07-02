@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-from astProcessing import findVar, generate_action_block, generate_turn_block
+from astProcessing import findVar, generate_action_block, generate_turn_block#, visualize_ast
 from symbolTable import validate_variable_usage
 from xmlUtils import generate_open_roberta_id
 
@@ -69,9 +69,13 @@ block_brick = ET.SubElement(instance_config, "block", {
 
 f = open("Code.txt", "r")
 
+# Obtiene el ultimo bloque de variable
+last_variable_block = None
+
 def process_line(line):
+    global last_variable_block
     try:
-        findVar(line, block_start, variables_declared)
+        last_variable_block = findVar(line, block_start, variables_declared, last_variable_block)
         generate_action_block(line, instance_program)
         generate_turn_block(line, instance_program)
     except ValueError as e:
@@ -82,12 +86,14 @@ while True:
     if(len(line) == 0):
         break
     process_line(line)
-    
+
+#visualize_ast(output_file="AST_output")
+
 f.close()
 
 # Escribir el árbol XML a un archivo sin la declaración
 tree = ET.ElementTree(root)
-with open("Salida.xml", "wb") as file:
+with open("NewSalida.xml", "wb") as file:
     tree.write(file, encoding="utf-8")  # No se incluye xml_declaration=True
 
 print("Archivo XML generado sin declaración: Salida.xml")

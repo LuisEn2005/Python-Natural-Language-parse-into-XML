@@ -2,23 +2,115 @@ import xml.etree.ElementTree as ET
 import re
 from xmlUtils import generate_open_roberta_id
 from symbolTable import register_variable, validate_variable_usage
+from graphviz import Digraph
 
-def findVar(line, block_start, variables_declared):
+AST = []
+
+""" def visualize_ast(ast_nodes = AST, output_file="ast"):
+    dot = Digraph(comment="AST", format="png")
+    dot.attr(rankdir="TB")  # De arriba hacia abajo
+
+    node_count = 0
+    def add_node(dot, node, parent_id=None):
+        nonlocal node_count
+        node_id = f"node{node_count}"
+        node_count += 1
+
+        # Etiqueta del nodo
+        if isinstance(node, VariableNode):
+            label = f"VAR\\n{node.name} = {node.value}\\n<{node.var_type}>"
+        elif isinstance(node, ActionNode):
+            label = f"{node.action_type}\\nDir: {node.direction}\\nSpd: {node.speed}"
+            if node.distance is not None:
+                label += f"\\nDist: {node.distance}"
+            if node.degree is not None:
+                label += f"\\nDeg: {node.degree}"
+        else:
+            label = node.node_type
+
+        dot.node(node_id, label, shape="box", style="filled", fillcolor="lightblue")
+
+        if parent_id:
+            dot.edge(parent_id, node_id)
+
+        # Recurde sobre hijos (si implementas nodos compuestos en el futuro)
+        for child in node.children:
+            add_node(dot, child, node_id)
+
+    # Agregar nodos raíz del AST
+    for ast_node in ast_nodes:
+        add_node(dot, ast_node)
+
+    # Renderizar el archivo .png
+    dot.render(filename=output_file, cleanup=True)
+    print(f"AST visualizado en: {output_file}.png") """
+
+
+class ASTNode:
+    def __init__(self, node_type, children=None, value=None):
+        self.node_type = node_type  # Tipo de nodo: "Variable", "Action", etc.
+        self.children = children or []  # Hijos del nodo
+        self.value = value  # Información adicional (e.g., nombre de variable, tipo, valor)
+
+    def __repr__(self):
+        return f"{self.node_type}({self.value}, Children: {len(self.children)})"
+
+# Nodo específico para declaraciones de variables
+class VariableNode(ASTNode):
+    def __init__(self, name, var_type, value):
+        super().__init__("Variable")
+        self.name = name
+        self.var_type = var_type
+        self.value = value
+
+    def __repr__(self):
+        return f"VariableNode({self.name}: {self.var_type} = {self.value})"
+
+# Nodo específico para acciones de movimiento
+class ActionNode(ASTNode):
+    def __init__(self, action_type, direction, speed, distance=None, degree=None):
+        super().__init__("Action")
+        self.action_type = action_type
+        self.direction = direction
+        self.speed = speed
+        self.distance = distance
+        self.degree = degree
+
+    def __repr__(self):
+        base = f"ActionNode({self.action_type}, {self.direction}, Speed: {self.speed}"
+        if self.distance is not None:
+            base += f", Distance: {self.distance}"
+        if self.degree is not None:
+            base += f", Degree: {self.degree}"
+        return base + ")"
+
+def findVar(line, block_start, variables_declared, last_variable_block):
     pattern = r"^var\s+(\w+)\s*=\s*(.+)"
+    pattern_bool = r"^var\s+(\w+)\s*=\s*(\w+)\s*(==|!=|<|<=|>|>=)\s*(\w+)"
+    pattern_math = r"^var\s+(\w+)\s*=\s*(\w+|\d+)\s*([\+\-\*/\^])\s*(\w+|\d+)"
     match = re.search(pattern, line)
+    match_bool = re.search(pattern_bool, line)
+    match_math = re.search(pattern_math, line)
+    field_type = None
+    block_type = None
+
+    # Verifica si el nodo 'variables' necesita ser creado
+    if not variables_declared:
+        variables = ET.SubElement(block_start, "statement", {"name": "ST"})
+        variables_declared = True
+        block_start.find("mutation").set("declare", "true")
     
-    if match:
+    else:
+        # Recupera la referencia al nodo 'statement' ya existente
+        variables = block_start.find("statement[@name='ST']")
+    
+    if match_bool:
+        last_variable_block = cmp_var(variables, match_bool, last_variable_block)
+    elif match_math:
+        last_variable_block = math_var(variables, match_math, last_variable_block)
+    elif match:
         variable_name = match.group(1)
         variable_value = match.group(2)
-        
-        # Verifica si el nodo 'variables' necesita ser creado
-        if not variables_declared:
-            variables = ET.SubElement(block_start, "statement", {"name": "ST"})
-            variables_declared = True
-            block_start.find("mutation").set("declare", "true")
-        else:
-            # Recupera la referencia al nodo 'statement' ya existente
-            variables = block_start.find("statement[@name='ST']")
         
         # Crear un bloque para la declaración de la variable
         variable_block = ET.SubElement(variables, "block", {
@@ -75,6 +167,7 @@ def findVar(line, block_start, variables_declared):
                     "next": "true",
                     "declaration_type": "Number"
                 })
+                
                 field_type = "Number"
                 block_type = "math_integer"
                 field_name = "NUM"
@@ -87,7 +180,6 @@ def findVar(line, block_start, variables_declared):
                 field_type = "Boolean"
                 block_type = "logic_boolean"
                 field_name = "BOOL"
-            register_variable(variable_name, field_type, variable_value)
             # Configuración de nodos comunes
             field_var = ET.SubElement(variable_block, "field", {"name": "VAR"})
             field_type_field = ET.SubElement(variable_block, "field", {"name": "TYPE"})
@@ -118,6 +210,172 @@ def findVar(line, block_start, variables_declared):
                 field_value = ET.SubElement(block_value, "field", {"name": field_name})
                 field_value.text = variable_value
             pass
+        if last_variable_block is None:
+            variables.append(variable_block)
+        else:
+            next_block = ET.SubElement(last_variable_block, "next")
+            next_block.append(variable_block)
+
+        last_variable_block = variable_block
+        register_variable(variable_name, field_type, variable_value)
+        AST.append(VariableNode(variable_name, field_type, variable_value))
+    return last_variable_block
+
+def cmp_var(variables, match_bool, last_variable_block):
+    variable_name = match_bool.group(1)
+    first_var = match_bool.group(2)
+    operator = match_bool.group(3)
+    second_var = match_bool.group(4)
+
+
+    validate_variable_usage(first_var, "Number")
+    validate_variable_usage(second_var, "Number")
+
+    opName = None
+
+    if(operator == "=="):
+        opName = "EQ"
+    elif(operator == "!="):
+        opName = "NEQ"
+    elif(operator == "<"):
+        opName = "LT"
+    elif(operator == "<="):
+        opName = "LTE"
+    elif(operator == ">"):
+        opName = "GT"
+    elif(operator == ">="):
+        opName = "GTE"
+    if opName is None:
+        raise ValueError(f"Operador de comparación inválido: {operator}")
+    
+    variable_block = ET.SubElement(variables, "block", {
+        "type": "robGlobalVariables_declare",    
+        "id": generate_open_roberta_id(),
+        "intask": "true",
+        "deletable": "false"
+    })
+
+    mutation = ET.SubElement(variable_block, "mutation", {
+        "next": "true",
+        "declaration_type": "Boolean"
+    })
+
+    block_type = "logic_compare"
+
+    field_var = ET.SubElement(variable_block, "field", {"name": "VAR"})
+    field_type_field = ET.SubElement(variable_block, "field", {"name": "TYPE"})
+    field_var.text = variable_name
+    field_type_field.text = "Boolean"
+
+    value = ET.SubElement(variable_block, "value", {"name": "VALUE"})
+    block_value = ET.SubElement(value, "block", {
+        "type": block_type,
+        "id": generate_open_roberta_id(),
+        "intask": "true"
+    })
+    field_value = ET.SubElement(block_value, "field", {"name": "OP"})
+    
+    field_value.text = opName
+    valueA = ET.SubElement(block_value, "value", {"name": "A"})
+    block_valueA = ET.SubElement(valueA, "block", {
+        "type": "variables_get",
+        "id": generate_open_roberta_id(),
+        "intask": "true"
+    })
+    mutation_block = ET.SubElement(block_valueA, "mutation", {"datatype": "Number"})
+    field_value_block = ET.SubElement(block_valueA, "field", {"name": "VAR"})
+    field_value_block.text = first_var
+
+    valueB = ET.SubElement(block_value, "value", {"name": "B"})
+    block_valueB = ET.SubElement(valueB, "block", {
+        "type": "variables_get",
+        "id": generate_open_roberta_id(),
+        "intask": "true"
+    })
+    mutation_block = ET.SubElement(block_valueB, "mutation", {"datatype": "Number"})
+    field_value_block = ET.SubElement(block_valueB, "field", {"name": "VAR"})
+    field_value_block.text = second_var
+    if last_variable_block is None:
+        variables.append(variable_block)
+    else:
+        next_block = ET.SubElement(last_variable_block, "next")
+        next_block.append(variable_block)
+
+    last_variable_block = variable_block
+    register_variable(variable_name, "Boolean", f"{first_var} {operator} {second_var}")
+    return last_variable_block
+
+def math_var(variables, match_math, last_variable_block):
+    variable_name = match_math.group(1)
+    first_var = match_math.group(2)
+    operator = match_math.group(3)
+    second_var = match_math.group(4)
+    opName = None
+
+    if(operator == '+'):
+        opName = "ADD"
+    elif(operator == '-'):
+        opName = "MINUS"
+    elif(operator == '*'):
+        opName = "MULTIPLY"
+    elif(operator == '/'):
+        opName = "DIVIDE"
+    elif(operator == '^'):
+        opName = "POWER"
+
+    variable_block = ET.SubElement(variables, "block", {
+        "type": "robGlobalVariables_declare",    
+        "id": generate_open_roberta_id(),
+        "intask": "true",
+        "deletable": "false"
+    })
+    mutation = ET.SubElement(variable_block, "mutation", {
+        "next": "true",
+        "declaration_type": "Number"
+    })
+    block_type = "math_arithmetic"
+
+    field_var = ET.SubElement(variable_block, "field", {"name": "VAR"})
+    field_type_field = ET.SubElement(variable_block, "field", {"name": "TYPE"})
+    field_var.text = variable_name
+    field_type_field.text = "Number"
+
+    value = ET.SubElement(variable_block, "value", {"name": "VALUE"})
+    block_value = ET.SubElement(value, "block", {
+        "type": block_type,
+        "id": generate_open_roberta_id(),
+        "intask": "true"
+    })
+    field_value = ET.SubElement(block_value, "field", {"name": "OP"})
+    field_value.text = opName
+    valueA = ET.SubElement(block_value, "value", {"name": "A"})
+    block_valueA = ET.SubElement(valueA, "block", {
+        "type": "variables_get",
+        "id": generate_open_roberta_id(),
+        "intask": "true"
+    })
+    mutation_block = ET.SubElement(block_valueA, "mutation", {"datatype": "Number"})
+    field_value_block = ET.SubElement(block_valueA, "field", {"name": "VAR"})
+    field_value_block.text = first_var
+
+    valueB = ET.SubElement(block_value, "value", {"name": "B"})
+    block_valueB = ET.SubElement(valueB, "block", {
+        "type": "variables_get",
+        "id": generate_open_roberta_id(),
+        "intask": "true"
+    })
+    mutation_block = ET.SubElement(block_valueB, "mutation", {"datatype": "Number"})
+    field_value_block = ET.SubElement(block_valueB, "field", {"name": "VAR"})
+    field_value_block.text = second_var
+    if last_variable_block is None:
+        variables.append(variable_block)
+    else:
+        next_block = ET.SubElement(last_variable_block, "next")
+        next_block.append(variable_block)
+
+    last_variable_block = variable_block
+    register_variable(variable_name, "Number", f"{first_var} {operator} {second_var}")
+    return last_variable_block
 
 def generate_action_block(line, instance_program):
     # Patrones para acciones con y sin distancia
@@ -143,7 +401,7 @@ def generate_action_block(line, instance_program):
         validate_variable_usage(speed, "Number")
     if has_distance and not distance.isdigit():
         validate_variable_usage(distance, "Number")
-    
+    AST.append(ActionNode("Move", direction, speed, distance=distance))
     # Crear el bloque principal
     if(has_distance):
         block_action = ET.SubElement(instance_program, "block", {
@@ -224,7 +482,7 @@ def generate_turn_block(line, instance_program):
         validate_variable_usage(speed)  # Verifica que `speed` esté declarada.
     if has_degree and not degree.isdigit():
         validate_variable_usage(degree)
-    
+    AST.append(ActionNode("Turn", direction, speed, degree=degree))
     # Crear el bloque principal
     if(has_degree):
         block_action = ET.SubElement(instance_program, "block", {

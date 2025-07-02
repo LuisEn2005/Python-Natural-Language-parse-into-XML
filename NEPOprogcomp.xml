@@ -1,0 +1,330 @@
+<export xmlns="http://de.fhg.iais.roberta.blockly">
+    <program>
+        <block_set xmlns="http://de.fhg.iais.roberta.blockly" robottype="edison" xmlversion="3.1"
+            description="" tags="">
+            <instance x="273" y="50">
+                <block type="robControls_start" id="['f0%k|_#B0dJakJcU[i" intask="true"
+                    deletable="false">
+                    <mutation declare="true"></mutation>
+                    <field name="DEBUG">TRUE</field>
+                    <data>
+                        {"learningRate":0.03,"regularizationRate":0,"noise":0,"batchSize":10,"discretize":false,"percTrainData":50,"activationKey":"linear","activation":{},"regularization":null,"initUntil":null,"collectStats":false,"numHiddenLayers":0,"networkShape":[],"weights":[[["1"]],[[]]],"biases":[["0"],["0"]],"precision":"2","weightArcMaxSize":8,"weightSuppressMultOp":true,"inputs":["n1"],"outputs":["n2"],"hiddenNeurons":[]}</data>
+                    <statement name="ST">
+                        <block type="robGlobalVariables_declare" id="h,X&amp;p;P!44Sn9^/h)(]p"
+                            intask="true" deletable="false">
+                            <mutation next="true" declaration_type="Number"></mutation>
+                            <field name="VAR">distance</field>
+                            <field name="TYPE">Number</field>
+                            <value name="VALUE">
+                                <block type="math_integer" id="jdjb,=r=AXqk#5I'X&amp;rF"
+                                    intask="true">
+                                    <field name="NUM">30</field>
+                                </block>
+                            </value>
+                        </block>
+                        <block type="robGlobalVariables_declare" id="W0O3Ni;QDq/2KAj9QyXA"
+                            intask="true" deletable="false">
+                            <mutation next="true" declaration_type="Number"></mutation>
+                            <field name="VAR">speed</field>
+                            <field name="TYPE">Number</field>
+                            <value name="VALUE">
+                                <block type="math_integer" id="9v&gt;/4*&gt;DGllL#YV?^*l^"
+                                    intask="true">
+                                    <field name="NUM">20</field>
+                                </block>
+                            </value>
+                        </block>
+                        <block type="robGlobalVariables_declare" id="W]oiW)mArZ:HIW|?*w0f"
+                            intask="true" deletable="false">
+                            <mutation next="true" declaration_type="Number"></mutation>
+                            <field name="VAR">elemento2</field>
+                            <field name="TYPE">Number</field>
+                            <value name="VALUE">
+                                <block type="math_arithmetic" id="~62}{s:V[Shmlc8?}cM1"
+                                    intask="true">
+                                    <field name="OP">ADD</field>
+                                    <value name="A">
+                                        <block type="variables_get" id="%0*aiOj(Co/4^3POW7m`"
+                                            intask="true">
+                                            <mutation datatype="Number"></mutation>
+                                            <field name="VAR">distance</field>
+                                        </block>
+                                    </value>
+                                    <value name="B">
+                                        <block type="variables_get" id="uzE.8P_bDj,8#86=T)ms"
+                                            intask="true">
+                                            <mutation datatype="Number"></mutation>
+                                            <field name="VAR">speed</field>
+                                        </block>
+                                    </value>
+                                </block>
+                            </value>
+                        </block>
+                        <block type="robGlobalVariables_declare" id="p4Nj6V1oyr=wauRLY{:!"
+                            intask="true" deletable="false">
+                            <mutation next="true" declaration_type="Number"></mutation>
+                            <field name="VAR">elemento3</field>
+                            <field name="TYPE">Number</field>
+                            <value name="VALUE">
+                                <block type="math_arithmetic" id="F:GTUCEO[g#L(mDpp:QI"
+                                    intask="true">
+                                    <field name="OP">MINUS</field>
+                                    <value name="A">
+                                        <block type="variables_get" id="Z[t=RTrV9dk=3tG6QE;t"
+                                            intask="true">
+                                            <mutation datatype="Number"></mutation>
+                                            <field name="VAR">distance</field>
+                                        </block>
+                                    </value>
+                                    <value name="B">
+                                        <block type="variables_get" id="NbMXR#Dtt~o~6ZW/,KJf"
+                                            intask="true">
+                                            <mutation datatype="Number"></mutation>
+                                            <field name="VAR">speed</field>
+                                        </block>
+                                    </value>
+                                </block>
+                            </value>
+                        </block>
+                        <block type="robGlobalVariables_declare" id="ayF3Ncs8R9(/Kx*x|k%j"
+                            intask="true" deletable="false">
+                            <mutation next="true" declaration_type="Number"></mutation>
+                            <field name="VAR">elemento4</field>
+                            <field name="TYPE">Number</field>
+                            <value name="VALUE">
+                                <block type="math_arithmetic" id="vV7o1vzzYcvVZc}q|D#1"
+                                    intask="true">
+                                    <field name="OP">MULTIPLY</field>
+                                    <value name="A">
+                                        <block type="variables_get" id="Uz5gHAr^d={#X!E%c!d1"
+                                            intask="true">
+                                            <mutation datatype="Number"></mutation>
+                                            <field name="VAR">distance</field>
+                                        </block>
+                                    </value>
+                                    <value name="B">
+                                        <block type="variables_get" id="H=p+F:mp@i=9Q^6niZQs"
+                                            intask="true">
+                                            <mutation datatype="Number"></mutation>
+                                            <field name="VAR">speed</field>
+                                        </block>
+                                    </value>
+                                </block>
+                            </value>
+                        </block>
+                        <block type="robGlobalVariables_declare" id="Vz1uJ.}[SYmjF({XD,zc"
+                            intask="true" deletable="false">
+                            <mutation next="true" declaration_type="Number"></mutation>
+                            <field name="VAR">elemento5</field>
+                            <field name="TYPE">Number</field>
+                            <value name="VALUE">
+                                <block type="math_arithmetic" id="P~vflZA#@JP{p[%6Y0S!"
+                                    intask="true">
+                                    <field name="OP">DIVIDE</field>
+                                    <value name="A">
+                                        <block type="variables_get" id="~Tc`:nwnSIe94N8!MD9y"
+                                            intask="true">
+                                            <mutation datatype="Number"></mutation>
+                                            <field name="VAR">distance</field>
+                                        </block>
+                                    </value>
+                                    <value name="B">
+                                        <block type="variables_get" id="PZWqfRX;^5|jkTgpeGIp"
+                                            intask="true">
+                                            <mutation datatype="Number"></mutation>
+                                            <field name="VAR">speed</field>
+                                        </block>
+                                    </value>
+                                </block>
+                            </value>
+                        </block>
+                        <block type="robGlobalVariables_declare" id="yQ{J/.+!TtElf8s-29R{"
+                            intask="true" deletable="false">
+                            <mutation next="true" declaration_type="Number"></mutation>
+                            <field name="VAR">elemento</field>
+                            <field name="TYPE">Number</field>
+                            <value name="VALUE">
+                                <block type="math_arithmetic" id="6Q}v410D-W3k3;CV=2_I"
+                                    intask="true">
+                                    <field name="OP">POWER</field>
+                                    <value name="A">
+                                        <block type="variables_get" id="8LBAs%{,F%]5*2=~8Cc1"
+                                            intask="true">
+                                            <mutation datatype="Number"></mutation>
+                                            <field name="VAR">distance</field>
+                                        </block>
+                                    </value>
+                                    <value name="B">
+                                        <block type="variables_get" id=")R15%3ZC4SgEk,A8*.P#"
+                                            intask="true">
+                                            <mutation datatype="Number"></mutation>
+                                            <field name="VAR">speed</field>
+                                        </block>
+                                    </value>
+                                </block>
+                            </value>
+                        </block>
+                        <block type="robGlobalVariables_declare" id="Ch8!75CSotcRZan&lt;KawK"
+                            intask="true" deletable="false">
+                            <mutation next="true" declaration_type="Boolean"></mutation>
+                            <field name="VAR">thebool</field>
+                            <field name="TYPE">Boolean</field>
+                            <value name="VALUE">
+                                <block type="logic_compare" id="(qw1`BokOO_1s,QW:o7{" intask="true">
+                                    <field name="OP">EQ</field>
+                                    <value name="A">
+                                        <block type="variables_get" id="6|dah^?nlRuXWAf_B%.#"
+                                            intask="true">
+                                            <mutation datatype="Number"></mutation>
+                                            <field name="VAR">distance</field>
+                                        </block>
+                                    </value>
+                                    <value name="B">
+                                        <block type="variables_get" id="Zm`R5NalxhbCqv?)hkZQ"
+                                            intask="true">
+                                            <mutation datatype="Number"></mutation>
+                                            <field name="VAR">speed</field>
+                                        </block>
+                                    </value>
+                                </block>
+                            </value>
+                        </block>
+                        <block type="robGlobalVariables_declare" id="a,lcf#}m=*#L7Y1tbTJB"
+                            intask="true" deletable="false">
+                            <mutation next="true" declaration_type="Boolean"></mutation>
+                            <field name="VAR">elemento6</field>
+                            <field name="TYPE">Boolean</field>
+                            <value name="VALUE">
+                                <block type="logic_compare" id=",H-be!D2|H5B=-%prQ3r" intask="true">
+                                    <field name="OP">NEQ</field>
+                                    <value name="A">
+                                        <block type="variables_get" id="57IGlnn0y_[aUZADN;?W"
+                                            intask="true">
+                                            <mutation datatype="Number"></mutation>
+                                            <field name="VAR">distance</field>
+                                        </block>
+                                    </value>
+                                    <value name="B">
+                                        <block type="variables_get" id="o;Y:5(,D,u;DP(b?q_PA"
+                                            intask="true">
+                                            <mutation datatype="Number"></mutation>
+                                            <field name="VAR">speed</field>
+                                        </block>
+                                    </value>
+                                </block>
+                            </value>
+                        </block>
+                        <block type="robGlobalVariables_declare" id="(,{mN%WMZ2jVoYRuihi}"
+                            intask="true" deletable="false">
+                            <mutation next="true" declaration_type="Boolean"></mutation>
+                            <field name="VAR">elemento7</field>
+                            <field name="TYPE">Boolean</field>
+                            <value name="VALUE">
+                                <block type="logic_compare" id=".QHCg(T0h6,XAa{yI!}*" intask="true">
+                                    <field name="OP">LT</field>
+                                    <value name="A">
+                                        <block type="variables_get" id="w@R3~2n/=7N3,2fnI?z4"
+                                            intask="true">
+                                            <mutation datatype="Number"></mutation>
+                                            <field name="VAR">distance</field>
+                                        </block>
+                                    </value>
+                                    <value name="B">
+                                        <block type="variables_get" id="c0LHQ:yi}?DlFOJ!5+[{"
+                                            intask="true">
+                                            <mutation datatype="Number"></mutation>
+                                            <field name="VAR">speed</field>
+                                        </block>
+                                    </value>
+                                </block>
+                            </value>
+                        </block>
+                        <block type="robGlobalVariables_declare" id="/kiw73Y)|Kjta*5B)Amq"
+                            intask="true" deletable="false">
+                            <mutation next="true" declaration_type="Boolean"></mutation>
+                            <field name="VAR">elemento8</field>
+                            <field name="TYPE">Boolean</field>
+                            <value name="VALUE">
+                                <block type="logic_compare" id="cY:-raV+HKYp:q[+ZdrQ" intask="true">
+                                    <field name="OP">LTE</field>
+                                    <value name="A">
+                                        <block type="variables_get" id="8ew6M@Xi=0(gCD4Uc{ui"
+                                            intask="true">
+                                            <mutation datatype="Number"></mutation>
+                                            <field name="VAR">distance</field>
+                                        </block>
+                                    </value>
+                                    <value name="B">
+                                        <block type="variables_get" id="liQeq}Z:IKMDgEJBH,TL"
+                                            intask="true">
+                                            <mutation datatype="Number"></mutation>
+                                            <field name="VAR">speed</field>
+                                        </block>
+                                    </value>
+                                </block>
+                            </value>
+                        </block>
+                        <block type="robGlobalVariables_declare" id="}wBi/4Ssxp~41s`j@7!+"
+                            intask="true" deletable="false">
+                            <mutation next="true" declaration_type="Boolean"></mutation>
+                            <field name="VAR">elemento9</field>
+                            <field name="TYPE">Boolean</field>
+                            <value name="VALUE">
+                                <block type="logic_compare" id="}Ue:,39s3H6#lHs)N)N3" intask="true">
+                                    <field name="OP">GT</field>
+                                    <value name="A">
+                                        <block type="variables_get" id="D0uC3j2|%l4He|u4FP3N"
+                                            intask="true">
+                                            <mutation datatype="Number"></mutation>
+                                            <field name="VAR">distance</field>
+                                        </block>
+                                    </value>
+                                    <value name="B">
+                                        <block type="variables_get" id="J-?yt;d8`uLx9lXjlm0%"
+                                            intask="true">
+                                            <mutation datatype="Number"></mutation>
+                                            <field name="VAR">speed</field>
+                                        </block>
+                                    </value>
+                                </block>
+                            </value>
+                        </block>
+                        <block type="robGlobalVariables_declare" id="DR.LZ1wcrR=BgX^pxC,Y"
+                            intask="true" deletable="false">
+                            <mutation next="true" declaration_type="Boolean"></mutation>
+                            <field name="VAR">elemento10</field>
+                            <field name="TYPE">Boolean</field>
+                            <value name="VALUE">
+                                <block type="logic_compare" id="--h^)Ke{mhpkUu)Fl5z~" intask="true">
+                                    <field name="OP">GTE</field>
+                                    <value name="A">
+                                        <block type="variables_get" id="BBby0h}zNdSH(xhmZ=*G"
+                                            intask="true">
+                                            <mutation datatype="Number"></mutation>
+                                            <field name="VAR">distance</field>
+                                        </block>
+                                    </value>
+                                    <value name="B">
+                                        <block type="variables_get" id="^Ce]7QXivgZ/d2GUU4mu"
+                                            intask="true">
+                                            <mutation datatype="Number"></mutation>
+                                            <field name="VAR">speed</field>
+                                        </block>
+                                    </value>
+                                </block>
+                            </value>
+                        </block>
+                    </statement>
+                </block>
+            </instance>
+        </block_set>
+    </program>
+    <config>
+        <block_set xmlns="http://de.fhg.iais.roberta.blockly" robottype="edison" xmlversion="3.1"
+            description="" tags="">
+            <instance x="213" y="213">
+                <block type="robBrick_Edison-Brick" id="1" intask="true" deletable="false" />
+            </instance>
+        </block_set>
+    </config>
+</export>
