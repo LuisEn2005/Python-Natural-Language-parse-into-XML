@@ -2,6 +2,17 @@ var speed = 20
 var distance = 30
 var thebool = false
 var lista = [1,2,3]
+var thebool2 = distance == speed
+var thebool3 = distance != speed
+var thebool4 = distance < speed
+var thebool5 = distance > speed
+var thebool6 = distance <= speed
+var thebool7 = distance >= speed
+var number1 = distance + speed
+var number2 = distance - speed
+var number3 = distance / speed
+var number4 = distance * speed
+var number5 = distance ^ speed
 
 Move Forward distance at speed
 Move Backward at 30
