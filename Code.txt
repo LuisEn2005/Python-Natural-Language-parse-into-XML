@@ -3,16 +3,7 @@ var distance = 30
 var thebool = false
 var lista = [1,2,3]
 var thebool2 = distance == speed
-var thebool3 = distance != speed
-var thebool4 = distance < speed
-var thebool5 = distance > speed
-var thebool6 = distance <= speed
-var thebool7 = distance >= speed
-var number1 = distance + speed
-var number2 = distance - speed
-var number3 = distance / speed
-var number4 = distance * speed
-var number5 = distance ^ speed
+var number1 = distance ^ speed
 
 Move Forward distance at speed
 Move Backward at 30
@@ -20,5 +11,7 @@ Move Backward at 30
 Turn Right 20 at 30
 Turn Left at 30
 
-loop():
-  Move Forward at speed with distance cm
+Loop():
+  Move Forward distance at speed
+Loop(10):
+  Move Forward distance at speed

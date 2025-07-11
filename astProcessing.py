@@ -356,7 +356,7 @@ def math_var(variables, match_math):
     
     register_variable(variable_name, "Number", f"{first_var} {operator} {second_var}")
 
-def generate_action_block(line, instance_program):
+def generate_action_block(line, patern):
     # Patrones para acciones con y sin distancia
     pattern_with_distance = r"Move\s+(Forward|Backward)\s+(\w+|\d+)\s+at\s+(\w+|\d+)"
     pattern_without_distance = r"Move\s+(Forward|Backward)\s+at\s+(\w+|\d+)"
@@ -383,13 +383,13 @@ def generate_action_block(line, instance_program):
     AST.append(ActionNode("Move", direction, speed, distance=distance))
     # Crear el bloque principal
     if(has_distance):
-        block_action = ET.SubElement(instance_program, "block", {
+        block_action = ET.SubElement(patern, "block", {
             "type": "robActions_motorDiff_on_for",
             "id": generate_open_roberta_id(),
             "intask": "true"
         })
     else:
-        block_action = ET.SubElement(instance_program, "block", {
+        block_action = ET.SubElement(patern, "block", {
             "type": "robActions_motorDiff_on",
             "id": generate_open_roberta_id(),
             "intask": "true"
@@ -438,7 +438,7 @@ def generate_action_block(line, instance_program):
             })
             ET.SubElement(distance_block, "field", {"name": "VAR"}).text = distance
 
-def generate_turn_block(line, instance_program):
+def generate_turn_block(line, patern):
     pattern_with_distance = r"Turn\s+(Right|Left)\s+(\w+|\d+)\s+at\s+(\w+|\d+)"
     pattern_without_distance = r"Turn\s+(Right|Left)\s+at\s+(\w+|\d+)"
     
@@ -464,13 +464,13 @@ def generate_turn_block(line, instance_program):
     AST.append(ActionNode("Turn", direction, speed, degree=degree))
     # Crear el bloque principal
     if(has_degree):
-        block_action = ET.SubElement(instance_program, "block", {
+        block_action = ET.SubElement(patern, "block", {
             "type": "robActions_motorDiff_turn_for",
             "id": generate_open_roberta_id(),
             "intask": "true"
         })
     else:
-        block_action = ET.SubElement(instance_program, "block", {
+        block_action = ET.SubElement(patern, "block", {
             "type": "robActions_motorDiff_turn",
             "id": generate_open_roberta_id(),
             "intask": "true"
@@ -516,3 +516,39 @@ def generate_turn_block(line, instance_program):
                 "intask": "true"
             })
             ET.SubElement(degree_block, "field", {"name": "VAR"}).text = degree
+
+def get_loop_block(line, instance_program):
+    loop_pattern = r"Loop(?:\((\d*)\))?:"
+    match = re.match(loop_pattern, line, re.I)
+
+    if match:
+        repetitions = match.group(1)
+
+        if repetitions:
+            # Loop con N repeticiones
+            loop_block = ET.SubElement(instance_program, "block", {
+                "type": "controls_repeat_ext",
+                "id": generate_open_roberta_id(),
+                "intask": "true"
+            })
+
+            # valor de las repeticiones
+            value_repeat = ET.SubElement(loop_block, "value", {"name": "TIMES"})
+            repeat_block = ET.SubElement(value_repeat, "block", {
+                "type": "math_integer",
+                "id": generate_open_roberta_id(),
+                "intask": "true"
+            })
+            ET.SubElement(repeat_block, "field", {"name": "NUM"}).text = repetitions
+
+        else:
+            loop_block = ET.SubElement(instance_program, "block", {
+            "type": "robControls_loopForever",
+            "id": generate_open_roberta_id(),
+            "intask": "true"
+            })
+
+        loop_statement = ET.SubElement(loop_block, "statement", {"name": "DO"})
+        return loop_statement
+    else:
+        None
