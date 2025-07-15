@@ -23,3 +23,15 @@ El sistema permite:
 - **Open Roberta** como plataforma de origen.
 - **REGEX** para aplicar patrones de Expresiones Regulares
 
+- Proyecto: Transformador de Lenguaje Natural a XML para Open Roberta
+│
+├── Code.txt             # Archivo de entrada con instrucciones en lenguaje natural
+├── README.md            # Documentación del proyecto
+│
+├── Xmlmaker.py          # Script principal: genera el archivo XML final
+├── astProcessing.py     # Procesa instrucciones y construye nodos XML
+├── symbolTable.py       # Maneja la tabla de símbolos y validación de variables
+├── xmlUtils.py          # Funciones auxiliares (IDs únicos, helpers XML)
+├── xml a dict.py        # Conversión experimental de XML a diccionario Python
+
+
