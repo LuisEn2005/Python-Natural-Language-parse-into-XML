@@ -67,25 +67,33 @@ block_brick = ET.SubElement(instance_config, "block", {
 
 f = open("Code.txt", "r")
 
-def process_line(line, curr_parent):
+def get_indent_level(line):
+    return len(line) - len(line.lstrip(" "))
+
+parent_stack = [(0, instance_tag)]
+
+def process_line(line, curr_parent):    
+    global parent_stack
+
+    indent = get_indent_level(line)
     stripped = line.strip()
 
-    try:
-        new_loop_parent = get_loop_block(stripped, instance_tag)
-        if new_loop_parent is not None:
-            return new_loop_parent
+    while parent_stack and indent < parent_stack[-1][0]:
+        parent_stack.pop()
 
-        if line.startswith("  "):
-            if curr_parent != instance_tag and stripped.startswith("var"):
-                raise ValueError("No se permiten declaraciones de variables dentro de un bucle.")
-            generate_action_block(stripped, curr_parent)
-            generate_turn_block(stripped, curr_parent)
-            return curr_parent
+    curr_parent = parent_stack[-1][1]
+    try:
+        new_loop_parent = get_loop_block(stripped, curr_parent)
+        if new_loop_parent is not None:
+            parent_stack.append((indent + 2, new_loop_parent))
+            return
         
-        findVar(line, block_start_tag)
-        generate_action_block(line, instance_tag)
-        generate_turn_block(line, instance_tag)
-        return instance_tag
+        if curr_parent != instance_tag and stripped.startswith("var"):
+            raise ValueError("No se permiten declaraciones de variables dentro de un bucle.")
+        
+        generate_action_block(stripped, curr_parent)
+        generate_turn_block(stripped, curr_parent)
+
     except ValueError as e:
         print(f"Error en línea '{line.strip()}': {e}")
 
@@ -93,7 +101,9 @@ while True:
     line = f.readline()
     if(len(line) == 0):
         break
+    findVar(line, block_start_tag)
     curr_parent = process_line(line, curr_parent)
+
 
 #visualize_ast(output_file="AST_output")
 

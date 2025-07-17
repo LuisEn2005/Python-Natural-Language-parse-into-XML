@@ -13,5 +13,9 @@ Turn Left at 30
 
 Loop():
   Move Forward distance at speed
+  Loop():
+    Move Forward distance at speed
+  Loop(10):
+    Move Forward distance at speed
 Loop(10):
   Move Forward distance at speed

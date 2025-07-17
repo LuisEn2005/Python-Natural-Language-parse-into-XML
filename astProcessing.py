@@ -92,13 +92,21 @@ def setVarStatement(block_start):
 
     return variables
 
+def get_bool_pattern(line):
+    pattern_bool = r"^var\s+(\w+)\s*=\s*(\w+)\s*(==|!=|<|<=|>|>=)\s*(\w+)"
+    return re.search(pattern_bool, line)
+
+def get_math_pattern(line):
+    pattern_math = r"^var\s+(\w+)\s*=\s*(\w+|\d+)\s*([\+\-\*/\^])\s*(\w+|\d+)"
+    return re.search(pattern_math, line)
+
 def findVar(line, block_start):
     pattern = r"^var\s+(\w+)\s*=\s*(.+)"
-    pattern_bool = r"^var\s+(\w+)\s*=\s*(\w+)\s*(==|!=|<|<=|>|>=)\s*(\w+)"
-    pattern_math = r"^var\s+(\w+)\s*=\s*(\w+|\d+)\s*([\+\-\*/\^])\s*(\w+|\d+)"
+    
     match = re.search(pattern, line)
-    match_bool = re.search(pattern_bool, line)
-    match_math = re.search(pattern_math, line)
+    match_bool = get_bool_pattern(line)
+    match_math = get_math_pattern(line)
+
     field_type = None
     block_type = None
     variables = setVarStatement(block_start)
@@ -552,3 +560,4 @@ def get_loop_block(line, instance_program):
         return loop_statement
     else:
         None
+        
