@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 import re
 from xmlUtils import generate_open_roberta_id
 from symbolTable import register_variable, validate_variable_usage
-from graphviz import Digraph
+#from graphviz import Digraph
 
 AST = []
 """ def visualize_ast(ast_nodes = AST, output_file="ast"):
