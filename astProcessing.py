@@ -222,33 +222,44 @@ def findVar(line, block_start):
         AST.append(VariableNode(variable_name, field_type, variable_value))
     return 
 
+def build_binary_operation_block(
+    parent,
+    block_type,
+    op_map,
+    left_var,
+    operator,
+    right_var,
+    datatype="Number"
+):
+    if operator not in op_map:
+        raise ValueError(f"Operador inválido: {operator}")
+
+    block_value = ET.SubElement(parent, "block", {
+        "type": block_type,
+        "id": generate_open_roberta_id(),
+        "intask": "true"
+    })
+
+    ET.SubElement(block_value, "field", {"name": "OP"}).text = op_map[operator]
+
+    for name, var in zip(("A", "B"), (left_var, right_var)):
+        val = ET.SubElement(block_value, "value", {"name": name})
+        var_block = ET.SubElement(val, "block", {
+            "type": "variables_get",
+            "id": generate_open_roberta_id(),
+            "intask": "true"
+        })
+        ET.SubElement(var_block, "mutation", {"datatype": datatype})
+        ET.SubElement(var_block, "field", {"name": "VAR"}).text = var
+
+    return block_value
+
 def cmp_var(variables, match_bool):
     variable_name = match_bool.group(1)
     first_var = match_bool.group(2)
     operator = match_bool.group(3)
     second_var = match_bool.group(4)
 
-
-    validate_variable_usage(first_var, "Number")
-    validate_variable_usage(second_var, "Number")
-
-    opName = None
-
-    if(operator == "=="):
-        opName = "EQ"
-    elif(operator == "!="):
-        opName = "NEQ"
-    elif(operator == "<"):
-        opName = "LT"
-    elif(operator == "<="):
-        opName = "LTE"
-    elif(operator == ">"):
-        opName = "GT"
-    elif(operator == ">="):
-        opName = "GTE"
-    if opName is None:
-        raise ValueError(f"Operador de comparación inválido: {operator}")
-    
     variable_block = ET.SubElement(variables, "block", {
         "type": "robGlobalVariables_declare",    
         "id": generate_open_roberta_id(),
@@ -256,47 +267,23 @@ def cmp_var(variables, match_bool):
         "deletable": "false"
     })
 
-    mutation = ET.SubElement(variable_block, "mutation", {
+    ET.SubElement(variable_block, "mutation", {
         "next": "true",
         "declaration_type": "Boolean"
     })
 
-    block_type = "logic_compare"
-
-    field_var = ET.SubElement(variable_block, "field", {"name": "VAR"})
-    field_type_field = ET.SubElement(variable_block, "field", {"name": "TYPE"})
-    field_var.text = variable_name
-    field_type_field.text = "Boolean"
+    ET.SubElement(variable_block, "field", {"name": "VAR"}).text = variable_name
+    ET.SubElement(variable_block, "field", {"name": "TYPE"}).text = "Boolean"
 
     value = ET.SubElement(variable_block, "value", {"name": "VALUE"})
-    block_value = ET.SubElement(value, "block", {
-        "type": block_type,
-        "id": generate_open_roberta_id(),
-        "intask": "true"
-    })
-    field_value = ET.SubElement(block_value, "field", {"name": "OP"})
-    
-    field_value.text = opName
-    valueA = ET.SubElement(block_value, "value", {"name": "A"})
-    block_valueA = ET.SubElement(valueA, "block", {
-        "type": "variables_get",
-        "id": generate_open_roberta_id(),
-        "intask": "true"
-    })
-    mutation_block = ET.SubElement(block_valueA, "mutation", {"datatype": "Number"})
-    field_value_block = ET.SubElement(block_valueA, "field", {"name": "VAR"})
-    field_value_block.text = first_var
+    build_binary_operation_block(value, "logic_compare", { "==": "EQ",
+                                                          "!=": "NEQ",
+                                                          "<": "LT",
+                                                          "<=": "LTE",
+                                                          ">": "GT",
+                                                          ">=": "GTE"},
+                                first_var, operator, second_var, "Number")
 
-    valueB = ET.SubElement(block_value, "value", {"name": "B"})
-    block_valueB = ET.SubElement(valueB, "block", {
-        "type": "variables_get",
-        "id": generate_open_roberta_id(),
-        "intask": "true"
-    })
-    mutation_block = ET.SubElement(block_valueB, "mutation", {"datatype": "Number"})
-    field_value_block = ET.SubElement(block_valueB, "field", {"name": "VAR"})
-    field_value_block.text = second_var
-    
     register_variable(variable_name, "Boolean", f"{first_var} {operator} {second_var}")
 
 def math_var(variables, match_math):
@@ -304,65 +291,38 @@ def math_var(variables, match_math):
     first_var = match_math.group(2)
     operator = match_math.group(3)
     second_var = match_math.group(4)
-    opName = None
 
-    if(operator == '+'):
-        opName = "ADD"
-    elif(operator == '-'):
-        opName = "MINUS"
-    elif(operator == '*'):
-        opName = "MULTIPLY"
-    elif(operator == '/'):
-        opName = "DIVIDE"
-    elif(operator == '^'):
-        opName = "POWER"
+    validate_variable_usage(first_var, "Number")
+    validate_variable_usage(second_var, "Number")
 
     variable_block = ET.SubElement(variables, "block", {
-        "type": "robGlobalVariables_declare",    
+        "type": "robGlobalVariables_declare",
         "id": generate_open_roberta_id(),
         "intask": "true",
         "deletable": "false"
     })
-    mutation = ET.SubElement(variable_block, "mutation", {
+
+    ET.SubElement(variable_block, "mutation", {
         "next": "true",
         "declaration_type": "Number"
     })
-    block_type = "math_arithmetic"
 
-    field_var = ET.SubElement(variable_block, "field", {"name": "VAR"})
-    field_type_field = ET.SubElement(variable_block, "field", {"name": "TYPE"})
-    field_var.text = variable_name
-    field_type_field.text = "Number"
+    ET.SubElement(variable_block, "field", {"name": "VAR"}).text = variable_name
+    ET.SubElement(variable_block, "field", {"name": "TYPE"}).text = "Number"
 
     value = ET.SubElement(variable_block, "value", {"name": "VALUE"})
-    block_value = ET.SubElement(value, "block", {
-        "type": block_type,
-        "id": generate_open_roberta_id(),
-        "intask": "true"
-    })
-    field_value = ET.SubElement(block_value, "field", {"name": "OP"})
-    field_value.text = opName
-    valueA = ET.SubElement(block_value, "value", {"name": "A"})
-    block_valueA = ET.SubElement(valueA, "block", {
-        "type": "variables_get",
-        "id": generate_open_roberta_id(),
-        "intask": "true"
-    })
-    mutation_block = ET.SubElement(block_valueA, "mutation", {"datatype": "Number"})
-    field_value_block = ET.SubElement(block_valueA, "field", {"name": "VAR"})
-    field_value_block.text = first_var
 
-    valueB = ET.SubElement(block_value, "value", {"name": "B"})
-    block_valueB = ET.SubElement(valueB, "block", {
-        "type": "variables_get",
-        "id": generate_open_roberta_id(),
-        "intask": "true"
-    })
-    mutation_block = ET.SubElement(block_valueB, "mutation", {"datatype": "Number"})
-    field_value_block = ET.SubElement(block_valueB, "field", {"name": "VAR"})
-    field_value_block.text = second_var
-    
+    build_binary_operation_block(value,"math_arithmetic",{
+                                                        "+": "ADD",
+                                                        "-": "MINUS",
+                                                        "*": "MULTIPLY",
+                                                        "/": "DIVIDE",
+                                                        "^": "POWER"
+                                                        },
+                                first_var,operator,second_var,"Number")
+
     register_variable(variable_name, "Number", f"{first_var} {operator} {second_var}")
+
 
 def generate_action_block(line, patern):
     # Patrones para acciones con y sin distancia
@@ -525,7 +485,7 @@ def generate_turn_block(line, patern):
             })
             ET.SubElement(degree_block, "field", {"name": "VAR"}).text = degree
 
-def get_loop_block(line, instance_program):
+def get_loop_block(line, parent):
     loop_pattern = r"Loop(?:\((\d*)\))?:"
     match = re.match(loop_pattern, line, re.I)
 
@@ -534,7 +494,7 @@ def get_loop_block(line, instance_program):
 
         if repetitions:
             # Loop con N repeticiones
-            loop_block = ET.SubElement(instance_program, "block", {
+            loop_block = ET.SubElement(parent, "block", {
                 "type": "controls_repeat_ext",
                 "id": generate_open_roberta_id(),
                 "intask": "true"
@@ -550,7 +510,7 @@ def get_loop_block(line, instance_program):
             ET.SubElement(repeat_block, "field", {"name": "NUM"}).text = repetitions
 
         else:
-            loop_block = ET.SubElement(instance_program, "block", {
+            loop_block = ET.SubElement(parent, "block", {
             "type": "robControls_loopForever",
             "id": generate_open_roberta_id(),
             "intask": "true"
@@ -561,3 +521,113 @@ def get_loop_block(line, instance_program):
     else:
         None
         
+def get_if_or_elif_statement(line, curr_parent, state):
+    if_pattern = r"if\s*\(\s*(.+?)\s*\)\s*:"
+    elif_pattern = r"elif\s*\(\s*(.+?)\s*\)\s*:"
+    cmp_pattern = r"(.+?)\s*(==|!=|<=|>=|<|>)\s*(.+)"
+
+    stripped = line.strip()
+
+    # Detectar if o elif
+    if_match = re.match(if_pattern, stripped)
+    elif_match = re.match(elif_pattern, stripped)
+
+    if if_match:
+        condition = if_match.group(1).strip()
+
+        cmp_match = re.match(cmp_pattern, condition)
+        if not cmp_match:
+            raise ValueError(f"La condición no es una comparación binaria válida: '{condition}'")
+
+        left_expr = cmp_match.group(1).strip()
+        operator = cmp_match.group(2).strip()
+        right_expr = cmp_match.group(3).strip()
+
+        validate_variable_usage(left_expr, "Number")
+        validate_variable_usage(right_expr, "Number")
+
+        # Crea el bloque if
+        if_block = ET.SubElement(curr_parent, "block", {
+            "type": "robControls_if",
+            "id": generate_open_roberta_id(),
+            "intask": "true"
+        })
+
+        # Inicializa mutación sin elif
+        mutation = ET.SubElement(if_block, "mutation", {"elseif": "0"})
+        # Inicializamos la etiqueta repetitions
+        repetitions_tag = ET.SubElement(if_block, "repetitions")
+
+        # value IF0
+        value_if = ET.SubElement(repetitions_tag, "value", {"name": "IF0"})
+        build_binary_operation_block(
+            value_if, "logic_compare",
+            {
+                "==": "EQ",
+                "!=": "NEQ",
+                "<": "LT",
+                "<=": "LTE",
+                ">": "GT",
+                ">=": "GTE"
+            },
+            left_expr, operator, right_expr, "Number"
+        )
+
+        # statement DO0
+        then_statement = ET.SubElement(repetitions_tag, "statement", {"name": "DO0"})
+
+        # Guarda el estado para futuros elif
+        state["current_if_block"] = if_block
+        state["elif_count"] = 0
+
+        return then_statement
+
+    elif elif_match:
+        condition = elif_match.group(1).strip()
+
+        cmp_match = re.match(cmp_pattern, condition)
+        if not cmp_match:
+            raise ValueError(f"La condición no es una comparación binaria válida: '{condition}'")
+
+        left_expr = cmp_match.group(1).strip()
+        operator = cmp_match.group(2).strip()
+        right_expr = cmp_match.group(3).strip()
+
+        validate_variable_usage(left_expr, "Number")
+        validate_variable_usage(right_expr, "Number")
+
+        # Debe existir un if activo
+        if_block = state.get("current_if_block")
+        if if_block is None:
+            raise ValueError(f"Se encontró 'elif' sin un 'if' previo")
+
+        # Actualiza la mutación
+        state["elif_count"] += 1
+        elif_count = state["elif_count"]
+
+        mutation = if_block.find("mutation")
+        mutation.set("elseif", str(elif_count))
+
+        repetitions_tag = if_block.find("repetitions")
+        # value IFn
+        value_if = ET.SubElement(repetitions_tag, "value", {"name": f"IF{elif_count}"})
+        build_binary_operation_block(
+            value_if, "logic_compare",
+            {
+                "==": "EQ",
+                "!=": "NEQ",
+                "<": "LT",
+                "<=": "LTE",
+                ">": "GT",
+                ">=": "GTE"
+            },
+            left_expr, operator, right_expr, "Number"
+        )
+
+        # statement DOn
+        then_statement = ET.SubElement(repetitions_tag, "statement", {"name": f"DO{elif_count}"})
+
+        return then_statement
+
+    return None
+

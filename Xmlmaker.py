@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-from astProcessing import findVar, generate_action_block, generate_turn_block, get_loop_block#, visualize_ast
+from astProcessing import findVar, generate_action_block, generate_turn_block, get_loop_block, get_if_or_elif_statement #, visualize_ast
 from symbolTable import validate_variable_usage
 from xmlUtils import generate_open_roberta_id
 
@@ -70,7 +70,12 @@ f = open("Code.txt", "r")
 def get_indent_level(line):
     return len(line) - len(line.lstrip(" "))
 
-parent_stack = [(0, instance_tag)]
+state = {
+    "current_if_block": None,
+    "elif_count": 0
+}
+
+parent_stack = [(0, instance_tag,)]
 
 def process_line(line, curr_parent):    
     global parent_stack
@@ -83,13 +88,19 @@ def process_line(line, curr_parent):
 
     curr_parent = parent_stack[-1][1]
     try:
+        if_statement = get_if_or_elif_statement(stripped, curr_parent, state)
+        if if_statement is not None:
+            parent_stack.append((indent + 2, if_statement))
+            return
+        
+        # loop
         new_loop_parent = get_loop_block(stripped, curr_parent)
         if new_loop_parent is not None:
             parent_stack.append((indent + 2, new_loop_parent))
             return
         
         if curr_parent != instance_tag and stripped.startswith("var"):
-            raise ValueError("No se permiten declaraciones de variables dentro de un bucle.")
+            raise ValueError("No se permiten declaraciones de variables al indentar.")
         
         generate_action_block(stripped, curr_parent)
         generate_turn_block(stripped, curr_parent)
@@ -111,7 +122,7 @@ f.close()
 
 # Escribir el árbol XML a un archivo sin la declaración
 tree = ET.ElementTree(export_tag)
-fileName = str("BucleOutput.xml")
+fileName = str("IfsOutput.xml")
 with open(fileName, "wb") as file:
     tree.write(file, encoding="utf-8")  # No se incluye xml_declaration=True
 

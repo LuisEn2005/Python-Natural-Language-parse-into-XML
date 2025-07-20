@@ -17,5 +17,28 @@ Loop():
     Move Forward distance at speed
   Loop(10):
     Move Forward distance at speed
+    Loop():
+      Move Forward distance at speed
+      Loop():
+        Move Forward distance at speed
+      Loop(10):
+        Move Forward distance at speed
+      Move Forward distance at speed
 Loop(10):
+  Move Forward distance at speed
+
+if(speed > distance):
+  Move Forward distance at speed
+
+if(speed > distance):
+  Move Forward distance at speed
+  if(speed > distance):
+    Move Forward distance at speed
+  elif(speed < distance):
+    Move Forward distance at speed
+    if(speed > distance):
+      Move Forward distance at speed
+    elif(speed < distance):
+      Move Forward distance at speed
+elif(speed < distance):
   Move Forward distance at speed
