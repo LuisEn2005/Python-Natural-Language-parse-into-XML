@@ -5,44 +5,6 @@ from symbolTable import register_variable, validate_variable_usage
 from logger import log_message, messages
 #from graphviz import Digraph
 
-class ASTNode:
-    def __init__(self, node_type, children=None, value=None):
-        self.node_type = node_type  # Tipo de nodo: "Variable", "Action", etc.
-        self.children = children or []  # Hijos del nodo
-        self.value = value  # Información adicional (e.g., nombre de variable, tipo, valor)
-
-    def __repr__(self):
-        return f"{self.node_type}({self.value}, Children: {len(self.children)})"
-
-# Nodo específico para declaraciones de variables
-class VariableNode(ASTNode):
-    def __init__(self, name, var_type, value):
-        super().__init__("Variable")
-        self.name = name
-        self.var_type = var_type
-        self.value = value
-
-    def __repr__(self):
-        return f"VariableNode({self.name}: {self.var_type} = {self.value})"
-
-# Nodo específico para acciones de movimiento
-class ActionNode(ASTNode):
-    def __init__(self, action_type, direction, speed, distance=None, degree=None):
-        super().__init__("Action")
-        self.action_type = action_type
-        self.direction = direction
-        self.speed = speed
-        self.distance = distance
-        self.degree = degree
-
-    def __repr__(self):
-        base = f"ActionNode({self.action_type}, {self.direction}, Speed: {self.speed}"
-        if self.distance is not None:
-            base += f", Distance: {self.distance}"
-        if self.degree is not None:
-            base += f", Degree: {self.degree}"
-        return base + ")"
-
 def setVarStatement(block_start):
     # Verifica si el nodo 'variables' necesita ser creado
     variables = block_start.find("statement[@name='ST']")
