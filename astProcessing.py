@@ -2,48 +2,8 @@ import xml.etree.ElementTree as ET
 import re
 from xmlUtils import generate_open_roberta_id
 from symbolTable import register_variable, validate_variable_usage
+from logger import log_message, messages
 #from graphviz import Digraph
-
-AST = []
-""" def visualize_ast(ast_nodes = AST, output_file="ast"):
-    dot = Digraph(comment="AST", format="png")
-    dot.attr(rankdir="TB")  # De arriba hacia abajo
-
-    node_count = 0
-    def add_node(dot, node, parent_id=None):
-        nonlocal node_count
-        node_id = f"node{node_count}"
-        node_count += 1
-
-        # Etiqueta del nodo
-        if isinstance(node, VariableNode):
-            label = f"VAR\\n{node.name} = {node.value}\\n<{node.var_type}>"
-        elif isinstance(node, ActionNode):
-            label = f"{node.action_type}\\nDir: {node.direction}\\nSpd: {node.speed}"
-            if node.distance is not None:
-                label += f"\\nDist: {node.distance}"
-            if node.degree is not None:
-                label += f"\\nDeg: {node.degree}"
-        else:
-            label = node.node_type
-
-        dot.node(node_id, label, shape="box", style="filled", fillcolor="lightblue")
-
-        if parent_id:
-            dot.edge(parent_id, node_id)
-
-        # Recurde sobre hijos (si implementas nodos compuestos en el futuro)
-        for child in node.children:
-            add_node(dot, child, node_id)
-
-    # Agregar nodos raíz del AST
-    for ast_node in ast_nodes:
-        add_node(dot, ast_node)
-
-    # Renderizar el archivo .png
-    dot.render(filename=output_file, cleanup=True)
-    print(f"AST visualizado en: {output_file}.png") """
-
 
 class ASTNode:
     def __init__(self, node_type, children=None, value=None):
@@ -219,7 +179,6 @@ def findVar(line, block_start):
             pass
 
         register_variable(variable_name, field_type, variable_value)
-        AST.append(VariableNode(variable_name, field_type, variable_value))
     return 
 
 def build_binary_operation_block(
@@ -348,7 +307,6 @@ def generate_action_block(line, patern):
         validate_variable_usage(speed, "Number")
     if has_distance and not distance.isdigit():
         validate_variable_usage(distance, "Number")
-    AST.append(ActionNode("Move", direction, speed, distance=distance))
     # Crear el bloque principal
     if(has_distance):
         block_action = ET.SubElement(patern, "block", {
@@ -429,7 +387,6 @@ def generate_turn_block(line, patern):
         validate_variable_usage(speed)  # Verifica que `speed` esté declarada.
     if has_degree and not degree.isdigit():
         validate_variable_usage(degree)
-    AST.append(ActionNode("Turn", direction, speed, degree=degree))
     # Crear el bloque principal
     if(has_degree):
         block_action = ET.SubElement(patern, "block", {
@@ -532,6 +489,15 @@ def get_if_or_elif_statement(line, curr_parent, state):
     if_match = re.match(if_pattern, stripped)
     elif_match = re.match(elif_pattern, stripped)
 
+    op_map={
+        "==": "EQ",        
+        "!=": "NEQ",
+        "<": "LT",
+        "<=": "LTE",
+        ">": "GT",
+        ">=": "GTE"
+    }
+
     if if_match:
         condition = if_match.group(1).strip()
 
@@ -561,16 +527,7 @@ def get_if_or_elif_statement(line, curr_parent, state):
         # value IF0
         value_if = ET.SubElement(repetitions_tag, "value", {"name": "IF0"})
         build_binary_operation_block(
-            value_if, "logic_compare",
-            {
-                "==": "EQ",
-                "!=": "NEQ",
-                "<": "LT",
-                "<=": "LTE",
-                ">": "GT",
-                ">=": "GTE"
-            },
-            left_expr, operator, right_expr, "Number"
+            value_if, "logic_compare", op_map, left_expr, operator, right_expr, "Number"
         )
 
         # statement DO0
@@ -587,7 +544,9 @@ def get_if_or_elif_statement(line, curr_parent, state):
 
         cmp_match = re.match(cmp_pattern, condition)
         if not cmp_match:
-            raise ValueError(f"La condición no es una comparación binaria válida: '{condition}'")
+            log_message("ERROR", f"La condición no es una comparación binaria válida: '{condition}'")
+            return None
+
 
         left_expr = cmp_match.group(1).strip()
         operator = cmp_match.group(2).strip()
@@ -612,18 +571,11 @@ def get_if_or_elif_statement(line, curr_parent, state):
         # value IFn
         value_if = ET.SubElement(repetitions_tag, "value", {"name": f"IF{elif_count}"})
         build_binary_operation_block(
-            value_if, "logic_compare",
-            {
-                "==": "EQ",
-                "!=": "NEQ",
-                "<": "LT",
-                "<=": "LTE",
-                ">": "GT",
-                ">=": "GTE"
-            },
-            left_expr, operator, right_expr, "Number"
+            value_if, "logic_compare", op_map, left_expr, operator, right_expr, "Number"
         )
-
+        if operator not in op_map:
+            log_message("ERROR", f"Operador inválido: {operator}")
+            return None
         # statement DOn
         then_statement = ET.SubElement(repetitions_tag, "statement", {"name": f"DO{elif_count}"})
 
